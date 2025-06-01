@@ -74,8 +74,10 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 
 ## Repository Structure
 
-NutriBench/
-│
+.
+├── README.md                  # Project overview (this file)
+├── requirements.txt           # Python dependencies
+├── report/                    # Final report and figures
 ├── data/                      # Processed data storage
 │   ├── method1_tfidf/         # Processed data using TF-IDF
 │   └── method2_sbert/         # Processed data using Sentence-BERT
@@ -89,8 +91,3 @@ NutriBench/
 │   ├── mlp/                   # Output CSVs, plots, logs from MLP
 │   ├── lstm/                  # Output CSVs, plots, logs from LSTM
 │   └── transformer/           # Output CSVs, plots, logs from Transformer
-│
-├── report/                    # Final report and figures
-│
-├── requirements.txt           # Required Python packages
-└── README.md                  # Project overview (this file)
