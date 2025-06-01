@@ -73,20 +73,20 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 ---
 
 ## Repository Structure
+
 ```
 .
-├── README.md # Project overview (this file)
-├── requirements.txt # Python dependencies
-├── report/ # Final report and figures
-├── data/ # Processed data storage
-│ ├── method1_tfidf/ # Processed data using TF-IDF
-│ └── method2_sbert/ # Processed data using Sentence-BERT
-├── src/ # Source code for each model
-│ ├── mlp_model/ # MLP implementation on different feature sets
-│ ├── lstm_model/ # LSTM-based regressor
-│ └── transformer_model/ # Transformer-based regression model (e.g., fine-tuned BERT)
-└── output/ # Model predictions and result logs
-├── mlp/ # Output CSVs, plots, logs from MLP
-├── lstm/ # Output CSVs, plots, logs from LSTM
-└── transformer/ # Output CSVs, plots, logs from Transformer
+├── README.md                  # Project overview (this file)
+├── requirements.txt           # Python dependencies
+├── report/                    # Final report and figures
+│ ├── method1_tfidf/           # Processed data using TF-IDF
+│ └── method2_sbert/           # Processed data using Sentence-BERT
+├── src/                       # Source code for each model
+│ ├── mlp_model/               # MLP implementation on different feature sets
+│ ├── lstm_model/              # LSTM-based regressor
+│ └── transformer_model/       # Transformer-based regression model (e.g., fine-tuned BERT)
+└── output/                    # Model predictions and result logs
+├── mlp/                       # Output CSVs, plots, logs from MLP
+├── lstm/                      # Output CSVs, plots, logs from LSTM
+└── transformer/               # Output CSVs, plots, logs from Transformer
 ```
