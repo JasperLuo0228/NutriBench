@@ -73,7 +73,7 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 ---
 
 ## Repository Structure
-
+```
 .
 ├── README.md # Project overview (this file)
 ├── requirements.txt # Python dependencies
@@ -89,3 +89,4 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 ├── mlp/ # Output CSVs, plots, logs from MLP
 ├── lstm/ # Output CSVs, plots, logs from LSTM
 └── transformer/ # Output CSVs, plots, logs from Transformer
+```
