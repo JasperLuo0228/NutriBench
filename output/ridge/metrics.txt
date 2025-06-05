@@ -1,0 +1,2 @@
+Validation MAE: 15.226
+Validation MSE: 777.626
