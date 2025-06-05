@@ -11,7 +11,7 @@ Given a dataset of meal descriptions and their corresponding carbohydrate values
 - Selecting the best-performing model to generate predictions on a test set.
 - Compiling a full pipeline with reproducible code and a well-documented report.
 
-We utilize **PyTorch** as the core framework, following best practices in feature extraction (e.g., TF-IDF, SBERT embeddings), deep learning modeling (e.g., MLP, LSTM, Transformers), and evaluation.
+We utilize **PyTorch** as the core framework, following best practices in feature extraction (e.g., TF-IDF, SBERT embeddings), machine learning and deep learning modeling (e.g., Ridge Regression, MLP, Transformers), and evaluation.
 
 ---
 
@@ -37,16 +37,16 @@ Processed data for each method is saved under:
 
 Each model is developed as a separate module under `src/`, and trained on the corresponding feature representation.
 
-| Model         | Description                          | Folder                  |
-|---------------|--------------------------------------|--------------------------|
-| **MLP**       | Trained on both TF-IDF and SBERT     | `src/mlp_model/`         |
-| **LSTM**      | Sequence model using tokenized text  | `src/lstm_model/`        |
-| **Transformer** | Fine-tuned pre-trained BERT        | `src/transformer_model/` |
+| Model           | Description                            | Folder                  |
+|------------------|----------------------------------------|--------------------------|
+| **Ridge**         | Linear regression on TF-IDF features   | `src/ridge_model/`       |
+| **MLP**           | Fully connected neural network using TF-IDF features   | `src/mlp_model/`         |
+| **Transformer**   | Fine-tuned pre-trained BERT model      | `src/transformer_model/` |
 
 Each model outputs predictions, metrics, and plots under the corresponding subfolder in `output/`:
 
+- `output/ridge/`
 - `output/mlp/`
-- `output/lstm/`
 - `output/transformer/`
 
 ---
@@ -83,10 +83,10 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 │ └── method2_sbert/           # Processed data using Sentence-BERT
 ├── src/                       # Source code for each model
 │ ├── mlp_model/               # MLP implementation on different feature sets
-│ ├── lstm_model/              # LSTM-based regressor
+│ ├── ridge_model/             # Linear regression based model
 │ └── transformer_model/       # Transformer-based regression model (e.g., fine-tuned BERT)
 └── output/                    # Model predictions and result logs
 ├── mlp/                       # Output CSVs, plots, logs from MLP
-├── lstm/                      # Output CSVs, plots, logs from LSTM
+├── ridge/                     # Output CSVs, plots, logs from LSTM
 └── transformer/               # Output CSVs, plots, logs from Transformer
 ```
