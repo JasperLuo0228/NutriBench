@@ -1,2 +1,3 @@
-Validation MAE: 15.226
-Validation MSE: 777.626
+Validation MAE: 14.946
+Validation MSE: 766.499
+Best alpha: 1.438449888287663
