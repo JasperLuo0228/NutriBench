@@ -1,0 +1,4 @@
+Best Params: {'colsample_bytree': np.float64(0.7038461436547678), 'learning_rate': np.float64(0.051547427194027134), 'max_depth': 7, 'n_estimators': 2771, 'subsample': np.float64(0.7798997559986003)}
+Validation MAE: 4.529
+Validation MSE: 108.294
+Validation predictions within ±7.5: 1650/2000 (82.50%)

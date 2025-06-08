@@ -1,69 +1,76 @@
 import os
-import sys
-import joblib
-import pandas as pd
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
-from sklearn.linear_model import RidgeCV
-from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.model_selection import train_test_split
 
-# Add tfidf module path
+# Paths (adjust if needed)
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-tfidf_path = os.path.join(base_dir, "data/method1_tfidf")
-sys.path.append(tfidf_path)
+train_path = os.path.join(base_dir, "data/train.csv")
+val_path = os.path.join(base_dir, "data/val.csv")
+test_path = os.path.join(base_dir, "data/test.csv")
 
-from tfidf import TfidfProcessor
+# Load datasets
+df_train = pd.read_csv(train_path)
+df_val = pd.read_csv(val_path)
+df_test = pd.read_csv(test_path)
 
-# Load Vectorizer
-tfidf_proc = TfidfProcessor()
-tfidf_proc.load_vectorizer(os.path.join(tfidf_path, "tfidf_vectorizer.joblib"))
+# TF-IDF Vectorization
+vectorizer = TfidfVectorizer(max_features=10000, ngram_range=(1, 2), stop_words="english")
+X_train = vectorizer.fit_transform(df_train["query"])
+X_val = vectorizer.transform(df_val["query"])
+X_test = vectorizer.transform(df_test["query"])
 
-# Load and transform training data
-df_train = pd.read_csv(os.path.join(base_dir, "data/train.csv"))
-X = tfidf_proc.transform(df_train["query"])
-y = df_train["carb"]
+# Transform target using log1p to reduce outlier effect
+y_train_log = np.log1p(df_train["carb"])
+y_val = df_val["carb"]
 
-# Train/validation split
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+# Train Ridge Regression
+model = Ridge(alpha=1.0)
+model.fit(X_train, y_train_log)
 
-# Train Ridge model
-# Define a range of alpha values to search
-alphas = np.logspace(-3, 3, 20) 
+# Predict on validation set
+y_val_pred_log = model.predict(X_val)
+y_val_pred = np.expm1(y_val_pred_log)  # Inverse transformation
 
-# Use RidgeCV to automatically find the best alpha
-model = RidgeCV(alphas=alphas, store_cv_values=True)
-model.fit(X_train, y_train)
-
-# Print best alpha
-print(f"Best alpha found: {model.alpha_}")
-
-# Validate
-y_val_pred = model.predict(X_val)
+# Evaluate
 mae = mean_absolute_error(y_val, y_val_pred)
 mse = mean_squared_error(y_val, y_val_pred)
-
 print(f"Validation MAE: {mae:.3f}")
 print(f"Validation MSE: {mse:.3f}")
 
-# Save validation output
-output_dir = os.path.join(base_dir, "output/ridge")
+# Plotting
+plt.figure(figsize=(6, 6))
+plt.scatter(y_val, y_val_pred, alpha=0.5)
+plt.plot([y_val.min(), y_val.max()], [y_val.min(), y_val.max()], 'r--')
+plt.xlabel("True Carb")
+plt.ylabel("Predicted Carb")
+plt.title("TF-IDF + Ridge Regression (log target)")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Save prediction and metrics
+output_dir = os.path.join(base_dir, "output/ridge_log")
 os.makedirs(output_dir, exist_ok=True)
 
-pd.DataFrame({
+# Save validation predictions
+val_out = pd.DataFrame({
     "y_true": y_val,
     "y_pred": y_val_pred
-}).to_csv(os.path.join(output_dir, "val_predictions.csv"), index=False)
+})
+val_out.to_csv(os.path.join(output_dir, "val_predictions.csv"), index=False)
 
+# Save test predictions
+y_test_pred = np.expm1(model.predict(X_test))
+test_out = df_test.copy()
+test_out["carb"] = y_test_pred
+test_out.to_csv(os.path.join(output_dir, "test_predictions.csv"), index=False)
+
+# Save metrics
 with open(os.path.join(output_dir, "metrics.txt"), "w") as f:
     f.write(f"Validation MAE: {mae:.3f}\n")
     f.write(f"Validation MSE: {mse:.3f}\n")
-    f.write(f"Best alpha: {model.alpha_}\n")
-
-# Predict on test set
-df_test = pd.read_csv(os.path.join(base_dir, "data/test.csv"))
-X_test = tfidf_proc.transform(df_test["query"])
-df_test["carb"] = model.predict(X_test)
-
-# Save final test predictions
-df_test.to_csv(os.path.join(output_dir, "test_predictions.csv"), index=False)
