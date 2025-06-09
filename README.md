@@ -11,7 +11,7 @@ Given a dataset of meal descriptions and their corresponding carbohydrate values
 - Selecting the best-performing model to generate predictions on a test set.
 - Compiling a full pipeline with reproducible code and a well-documented report.
 
-We utilize **PyTorch** as the core framework, following best practices in feature extraction (e.g., TF-IDF, SBERT embeddings), machine learning and deep learning modeling (e.g., Ridge Regression, MLP, Transformers), and evaluation.
+We utilize **PyTorch** as the core framework, following best practices in feature extraction (e.g., TF-IDF, SBERT embeddings), machine learning and deep learning modeling (e.g., Ridge Regression, MLP, XGBoost, Transformers), and evaluation.
 
 ---
 
@@ -41,12 +41,14 @@ Each model is developed as a separate module under `src/`, and trained on the co
 |------------------|----------------------------------------|--------------------------|
 | **Ridge**         | Linear regression on TF-IDF features   | `src/ridge_model/`       |
 | **MLP**           | Fully connected neural network using TF-IDF features   | `src/mlp_model/`         |
+| **XGBoost**           | Gradient‑boosted decision‑tree ensemble(Bayesian‑tuned)   | `src/xgboost_model/`         |
 | **Transformer**   | Fine-tuned pre-trained BERT model      | `src/transformer_model/` |
 
 Each model outputs predictions, metrics, and plots under the corresponding subfolder in `output/`:
 
 - `output/ridge/`
 - `output/mlp/`
+- `output/xgboost/`
 - `output/transformer/`
 
 ---
@@ -84,9 +86,11 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 ├── src/                       # Source code for each model
 │ ├── mlp_model/               # MLP implementation on different feature sets
 │ ├── ridge_model/             # Linear regression based model
+| ├── xgboost_model/           # Gradient‑boosted decision‑tree model
 │ └── transformer_model/       # Transformer-based regression model (e.g., fine-tuned BERT)
 └── output/                    # Model predictions and result logs
 ├── mlp/                       # Output CSVs, plots, logs from MLP
-├── ridge/                     # Output CSVs, plots, logs from LSTM
+├── ridge/                     # Output CSVs, plots, logs from Ridge
+├── xgboost/                   # Output CSVs, plots, logs from XGBoost
 └── transformer/               # Output CSVs, plots, logs from Transformer
 ```
