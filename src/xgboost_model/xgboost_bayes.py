@@ -1,12 +1,13 @@
 import os
 import pandas as pd
+import numpy as np
 from scipy import sparse
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import randint, uniform
+from skopt import BayesSearchCV
+from skopt.space import Real, Integer
 from xgboost import XGBRegressor
 
-# Paths
+# Paths 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 data_dir = os.path.join(base_dir, "data")
 tfidf_dir = os.path.join(data_dir, "method1_tfidf")
@@ -19,60 +20,52 @@ X_test = sparse.load_npz(os.path.join(tfidf_dir, "X_test.npz"))
 y_train = pd.read_csv(os.path.join(data_dir, "train.csv"))["carb"]
 y_val = pd.read_csv(os.path.join(data_dir, "val.csv"))["carb"]
 
-
 # Combine train and val for cross-validation
 X = sparse.vstack([X_train, X_val])
 y = pd.concat([y_train, y_val]).reset_index(drop=True)
 
-# Define model and search space
+# Define model
 xgb = XGBRegressor(objective="reg:squarederror", n_jobs=-1, random_state=42)
 
-param_grid = {
-    "max_depth": [4, 6, 8],
-    "learning_rate": [0.01, 0.1, 0.2],
-    "n_estimators": [100, 200, 300],
-    "subsample": [0.7, 0.9, 1.0],
-    "colsample_bytree": [0.7, 0.9, 1.0],
+# Define Bayesian search space
+search_space = {
+    "max_depth": Integer(4, 10),
+    "learning_rate": Real(0.01, 0.2, prior='log-uniform'),
+    "n_estimators": Integer(2000, 3000),
+    "subsample": Real(0.7, 1.0),
+    "colsample_bytree": Real(0.7, 1.0),
 }
 
-search = RandomizedSearchCV(
+# Bayesian optimization
+opt = BayesSearchCV(
     xgb,
-    param_distributions={
-        "max_depth": randint(4, 9),
-        "learning_rate": uniform(0.01, 0.1),
-        "n_estimators": randint(2000,3000),
-        "subsample": uniform(0.7, 0.3),
-        "colsample_bytree": uniform(0.7, 0.3),
-    },
-    n_iter=20, 
+    search_spaces=search_space,
+    n_iter=50,
     scoring="neg_mean_squared_error",
     cv=3,
     verbose=1,
-    n_jobs=1 
+    n_jobs=1,
+    random_state=42
 )
 
-# Run search
-search.fit(X, y)
-best_params = search.best_params_
-print("Best Parameters from RandomizedSearchCV:", best_params)
+opt.fit(X, y)
 
+best_params = opt.best_params_
+print(" Best Parameters from BayesSearchCV:", best_params)
 
-
-# Best model evaluation
-best_model = search.best_estimator_
+# Evaluate best model
+best_model = opt.best_estimator_
 y_val_pred = best_model.predict(X_val)
 mae = mean_absolute_error(y_val, y_val_pred)
 mse = mean_squared_error(y_val, y_val_pred)
 
-# Check how many predictions are within ±7.5 of ground truth
 within_range_mask = (abs(y_val_pred - y_val) <= 7.5)
 within_range_count = within_range_mask.sum()
 total_count = len(y_val)
 percent_within_range = 100 * within_range_count / total_count
 
-# Predict test set
+# Predict on test set
 y_test_pred = best_model.predict(X_test)
-
 
 # Save results
 output_dir = os.path.join(base_dir, "output/xgboost")
@@ -83,23 +76,39 @@ pd.DataFrame({
     "y_pred": y_val_pred
 }).to_csv(os.path.join(output_dir, "val_predictions.csv"), index=False)
 
-# Save test predictions
-pd.DataFrame({
+test_df = pd.read_csv(os.path.join(data_dir, "test.csv"))
+
+test_output = pd.DataFrame({
+    "id": test_df.iloc[:, 0],
+    "query": test_df["query"],
     "y_pred": y_test_pred
-}).to_csv(os.path.join(output_dir, "test_predictions.csv"), index=False)
+})
 
+test_output.to_csv(os.path.join(output_dir, "test_predictions.csv"), index=False)
 
-# Save metrics
+# Create validation diagnostics
+val_df = pd.read_csv(os.path.join(data_dir, "val.csv"))
+val_df["carb_true"] = y_val.values
+val_df["carb_pred"] = y_val_pred
+val_df["abs_error"] = np.abs(y_val - y_val_pred)
+val_df["within_7.5"] = val_df["abs_error"] <= 7.5
+
+val_df.to_csv(os.path.join(output_dir, "val_diagnostics.csv"), index=False)
+
+# Print top 10 worst predictions
+print("\n Top 10 largest prediction errors:")
+print(val_df.sort_values("abs_error", ascending=False)[["carb_true", "carb_pred", "abs_error"]].head(10))
+
 with open(os.path.join(output_dir, "metrics.txt"), "w") as f:
-    f.write("Best Params: " + str(search.best_params_) + "\n")
+    f.write("Best Params: " + str(opt.best_params_) + "\n")
     f.write(f"Validation MAE: {mae:.3f}\n")
     f.write(f"Validation MSE: {mse:.3f}\n")
     f.write(f"Validation predictions within ±7.5: {within_range_count}/{total_count} "
             f"({percent_within_range:.2f}%)\n")
 
-# === Print summary
+# Print summary
 print("\n Evaluation Summary:")
-print("Best Parameters:", search.best_params_)
+print("Best Parameters:", opt.best_params_)
 print(f"Validation MAE: {mae:.3f}")
 print(f"Validation MSE: {mse:.3f}")
 print(f"Predictions within ±7.5g: {within_range_count}/{total_count} ({percent_within_range:.2f}%)")

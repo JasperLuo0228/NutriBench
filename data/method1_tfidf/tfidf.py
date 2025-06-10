@@ -44,9 +44,7 @@ class TfidfProcessor:
 
         return X_train, X_val, X_test
 
-# === Run this script directly to save outputs ===
 if __name__ == "__main__":
-    # Path to save files (same folder as this file)
     out_dir = os.path.dirname(__file__)
 
     # Load raw text data
@@ -63,4 +61,4 @@ if __name__ == "__main__":
         out_dir=out_dir
     )
 
-    print("✅ TF-IDF files saved to:", out_dir)
+    print("TF-IDF files saved to:", out_dir)

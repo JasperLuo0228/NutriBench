@@ -1,4 +1,4 @@
-Best Params: {'colsample_bytree': np.float64(0.7038461436547678), 'learning_rate': np.float64(0.051547427194027134), 'max_depth': 7, 'n_estimators': 2771, 'subsample': np.float64(0.7798997559986003)}
-Validation MAE: 4.529
-Validation MSE: 108.294
-Validation predictions within ±7.5: 1650/2000 (82.50%)
+Best Params: OrderedDict([('colsample_bytree', 0.7), ('learning_rate', 0.05963169749701642), ('max_depth', 10), ('n_estimators', 3000), ('subsample', 0.8476630089480802)])
+Validation MAE: 2.499
+Validation MSE: 73.556
+Validation predictions within ±7.5: 1928/2000 (96.40%)
