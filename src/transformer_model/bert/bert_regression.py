@@ -9,9 +9,9 @@ class BERTRegression(nn.Module):
         self.regressor = nn.Sequential(
             nn.Linear(self.bert.config.hidden_size, 128),
             nn.ReLU(),
-            nn.Dropout(0.1),
+            nn.Dropout(0.2),
             nn.Linear(128, 1),
-            nn.ReLU()  
+            # nn.Sigmoid()  
         )
 
     def forward(self, input_ids, attention_mask):
