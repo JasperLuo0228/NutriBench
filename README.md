@@ -25,7 +25,8 @@ This project follows a modular workflow structured into the following key stages
   - Uses `TfidfVectorizer` to extract sparse features from text.
 - **Method 2: Sentence-BERT Embeddings**
   - Uses the `"all-MiniLM-L6-v2"` pre-trained model to create dense sentence embeddings.
-
+- **Method 3: Sentence-transformer**
+  - Uses the `"all-mpnet-base-v2"` pre-trained model to create dense sentence embeddings.
 Processed data for each method is saved under:
 
 - `data/method1_tfidf/`
