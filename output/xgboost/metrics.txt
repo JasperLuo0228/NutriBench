@@ -1,4 +1,7 @@
-Best Params: OrderedDict([('colsample_bytree', 0.7), ('learning_rate', 0.05963169749701642), ('max_depth', 10), ('n_estimators', 3000), ('subsample', 0.8476630089480802)])
-Validation MAE: 2.499
-Validation MSE: 73.556
-Validation predictions within ±7.5: 1928/2000 (96.40%)
+Best Params: OrderedDict([('colsample_bytree', 0.7376296676494726), ('learning_rate', 0.020584396744207145), ('max_depth', 8), ('n_estimators', 3000), ('subsample', 0.7)])
+Training MAE: 4.976
+Training MSE: 48.015
+Training predictions within ±7.5: 6261/8000 (78.26%)
+Validation MAE: 11.607
+Validation MSE: 792.038
+Validation predictions within ±7.5: 1223/2000 (61.15%)
