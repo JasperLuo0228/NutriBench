@@ -25,8 +25,8 @@ This project follows a modular workflow structured into the following key stages
   - Uses `TfidfVectorizer` to extract sparse features from text.
 - **Method 2: Sentence-BERT Embeddings**
   - Uses the `"all-MiniLM-L6-v2"` pre-trained model to create dense sentence embeddings.
-- **Method 3: Sentence-transformer**
-  - Uses the `"all-mpnet-base-v2"` pre-trained model to create dense sentence embeddings.
+- **Method 3: BERT Tokenizer**
+  - Uses the `"BERT Tokenizer"` to extract features from text.
 Processed data for each method is saved under:
 
 - `data/method1_tfidf/`
@@ -40,16 +40,18 @@ Each model is developed as a separate module under `src/`, and trained on the co
 
 | Model           | Description                            | Folder                  |
 |------------------|----------------------------------------|--------------------------|
-| **Ridge**         | Linear regression on TF-IDF features   | `src/ridge_model/`       |
-| **MLP**           | Fully connected neural network using TF-IDF features   | `src/mlp_model/`         |
-| **XGBoost**           | Gradient‑boosted decision‑tree ensemble(Bayesian‑tuned)   | `src/xgboost_model/`         |
-| **Transformer**   | Fine-tuned pre-trained BERT model      | `src/transformer_model/` |
+| **TF-IDF → Ridge** | L2-regularised linear regression | `src/ridge_model/` |
+| **TF-IDF → MLP** | 3-layer feed-forward network | `src/mlp_model/` |
+| **TF-IDF → XGBoost** | Bayesian-tuned gradient-boosted trees | `src/xgboost_model/` |
+| **BERT → MLP** | Fine-tuned `bert-base-uncased` + 2-layer head | `src/bert_model/` |
+| **SBERT → Transformer** | Frozen MiniLM embeddings + 6-layer transformer regressor & hybrid loss | `src/transformer_model/` |
 
 Each model outputs predictions, metrics, and plots under the corresponding subfolder in `output/`:
 
 - `output/ridge/`
 - `output/mlp/`
 - `output/xgboost/`
+- `output/bert/`
 - `output/transformer/`
 
 ---
@@ -88,10 +90,12 @@ Each model outputs predictions, metrics, and plots under the corresponding subfo
 │ ├── mlp_model/               # MLP implementation on different feature sets
 │ ├── ridge_model/             # Linear regression based model
 | ├── xgboost_model/           # Gradient‑boosted decision‑tree model
+| ├── bert_model/              # Fine-tuned BERT encoder + 2-layer MLP regression head
 │ └── transformer_model/       # Transformer-based regression model (e.g., fine-tuned BERT)
 └── output/                    # Model predictions and result logs
 ├── mlp/                       # Output CSVs, plots, logs from MLP
 ├── ridge/                     # Output CSVs, plots, logs from Ridge
 ├── xgboost/                   # Output CSVs, plots, logs from XGBoost
+├── bert/                      # Output CSVs, plots, logs from Bert
 └── transformer/               # Output CSVs, plots, logs from Transformer
 ```
